@@ -1,10 +1,15 @@
 const state = {
   current: 0,
-  answers: new Array(questions.length).fill(null),
+  answers: [],
   startTime: null,
   endTime: null,
-  finished: false
+  finished: false,
+  advancedMode: false,
+  advancedAnswers: []
 };
+
+let shuffledOrder = [];
+let advShuffledOrder = [];
 
 function getScreen(id) {
   return document.getElementById(id);
@@ -23,7 +28,9 @@ function shuffleArray(arr) {
   return arr;
 }
 
-let shuffledOrder = [];
+const typeLabels = { pattern: 'Pattern Recognition', math: 'Math Logic', verbal: 'Verbal Reasoning', spatial: 'Spatial Reasoning', logic: 'Logic' };
+
+// ─── Standard Test ───
 
 function initTest() {
   shuffledOrder = shuffleArray([...Array(questions.length).keys()]);
@@ -32,18 +39,24 @@ function initTest() {
   state.startTime = Date.now();
   state.endTime = null;
   state.finished = false;
+  state.advancedMode = false;
   showScreen('testScreen');
   renderQuestion();
 }
 
 function renderQuestion() {
-  const idx = shuffledOrder[state.current];
-  const q = questions[idx];
+  const isAdvanced = state.advancedMode;
+  const qList = isAdvanced ? advancedQuestions : questions;
+  const order = isAdvanced ? advShuffledOrder : shuffledOrder;
+  const ansList = isAdvanced ? state.advancedAnswers : state.answers;
+  const total = qList.length;
+  const idx = order[state.current];
+  const q = qList[idx];
 
-  document.getElementById('progressBar').style.width = ((state.current) / questions.length * 100) + '%';
-  document.getElementById('progressText').textContent = `Question ${state.current + 1} of ${questions.length}`;
+  document.getElementById('progressBar').style.width = (state.current / total * 100) + '%';
+  document.getElementById('progressText').textContent = `Question ${state.current + 1} of ${total}`;
+  if (isAdvanced) document.getElementById('progressText').textContent += ' [ADVANCED]';
 
-  const typeLabels = { pattern: 'Pattern Recognition', math: 'Math Logic', verbal: 'Verbal Reasoning', spatial: 'Spatial Reasoning' };
   document.getElementById('qBadge').textContent = typeLabels[q.type] || q.type;
   document.getElementById('qNumber').textContent = `Question ${state.current + 1}`;
   document.getElementById('qText').innerHTML = q.question;
@@ -54,20 +67,21 @@ function renderQuestion() {
   q.options.forEach((opt, i) => {
     const btn = document.createElement('button');
     btn.className = 'option-btn';
-    if (state.answers[state.current] === i) btn.classList.add('selected');
+    if (ansList[state.current] === i) btn.classList.add('selected');
     btn.innerHTML = `<span class="option-letter">${letters[i]}</span><span class="option-text">${opt}</span>`;
     btn.onclick = () => selectOption(i);
     container.appendChild(btn);
   });
 
   document.getElementById('prevBtn').style.display = state.current === 0 ? 'none' : 'inline-block';
-  const isLast = state.current === questions.length - 1;
+  const isLast = state.current === total - 1;
   document.getElementById('nextBtn').textContent = isLast ? 'Complete' : 'Next →';
-  document.getElementById('nextBtn').disabled = state.answers[state.current] === null;
+  document.getElementById('nextBtn').disabled = ansList[state.current] === null;
 }
 
 function selectOption(idx) {
-  state.answers[state.current] = idx;
+  const ansList = state.advancedMode ? state.advancedAnswers : state.answers;
+  ansList[state.current] = idx;
   document.querySelectorAll('.option-btn').forEach((btn, i) => {
     btn.classList.toggle('selected', i === idx);
   });
@@ -75,9 +89,12 @@ function selectOption(idx) {
 }
 
 function nextQuestion() {
-  if (state.answers[state.current] === null) return;
-  if (state.current === questions.length - 1) {
-    finishTest();
+  const ansList = state.advancedMode ? state.advancedAnswers : state.answers;
+  if (ansList[state.current] === null) return;
+  const total = state.advancedMode ? advancedQuestions.length : questions.length;
+  if (state.current === total - 1) {
+    if (state.advancedMode) finishAdvancedTest();
+    else finishTest();
     return;
   }
   state.current++;
@@ -96,6 +113,68 @@ function finishTest() {
   showResults();
 }
 
+// ─── Advanced Test ───
+
+function initAdvancedTest() {
+  advShuffledOrder = shuffleArray([...Array(advancedQuestions.length).keys()]);
+  state.current = 0;
+  state.advancedAnswers = new Array(advancedQuestions.length).fill(null);
+  state.startTime = Date.now();
+  state.endTime = null;
+  state.advancedMode = true;
+  showScreen('testScreen');
+  renderQuestion();
+}
+
+function finishAdvancedTest() {
+  state.endTime = Date.now();
+  showAdvancedResults();
+}
+
+function calculateAdvancedIQ() {
+  let correct = 0;
+  advShuffledOrder.forEach((qIdx, i) => {
+    if (state.advancedAnswers[i] === advancedQuestions[qIdx].answer) correct++;
+  });
+
+  const rawScore = correct;
+  const total = advancedQuestions.length;
+  let iq;
+  if (rawScore >= 14) iq = 250 + (rawScore - 14) * 26;
+  else if (rawScore >= 12) iq = 220 + (rawScore - 12) * 15;
+  else if (rawScore >= 10) iq = 195 + (rawScore - 10) * 12.5;
+  else if (rawScore >= 8) iq = 175 + (rawScore - 8) * 10;
+  else if (rawScore >= 6) iq = 165 + (rawScore - 6) * 5;
+  else iq = 165;
+  iq = Math.round(Math.max(165, Math.min(300, iq)));
+
+  const timeSeconds = Math.round((state.endTime - state.startTime) / 1000);
+  const timeMinutes = Math.floor(timeSeconds / 60);
+  const timeRemainder = timeSeconds % 60;
+
+  return { rawScore, total, iq, timeMinutes, timeRemainder, timeSeconds };
+}
+
+function showAdvancedResults() {
+  const result = calculateAdvancedIQ();
+  showScreen('advResultScreen');
+
+  document.getElementById('advIqScore').textContent = result.iq;
+  const labels = ['Elite', 'Genius', 'Transcendent'];
+  const thresholds = [180, 220, 260];
+  let label = labels[0];
+  for (let i = thresholds.length - 1; i >= 0; i--) {
+    if (result.iq >= thresholds[i]) { label = labels[i]; break; }
+  }
+  document.getElementById('advIqLabel').textContent = label;
+  document.getElementById('advRawScore').textContent = `${result.rawScore} / ${result.total}`;
+  document.getElementById('advTimeTaken').textContent = `${result.timeMinutes}m ${result.timeRemainder}s`;
+
+  saveToHistory({ ...result, percentile: 99, categories: {} });
+}
+
+// ─── Standard Results ───
+
 function calculateIQ() {
   let correct = 0;
   const categories = { pattern: { correct: 0, total: 0 }, math: { correct: 0, total: 0 }, verbal: { correct: 0, total: 0 }, spatial: { correct: 0, total: 0 } };
@@ -110,12 +189,18 @@ function calculateIQ() {
   });
 
   const rawScore = correct;
-  let iq = Math.round(60 + Math.pow(rawScore / 30, 2) * 290);
-  iq = Math.max(60, Math.min(350, iq));
-  iq = Math.round(Math.max(60, Math.min(160, iq)));
+  let iq;
+  if (rawScore >= 28) iq = 150 + (rawScore - 28) * 7.5;
+  else if (rawScore >= 24) iq = 130 + (rawScore - 24) * 5;
+  else if (rawScore >= 20) iq = 115 + (rawScore - 20) * 3.75;
+  else if (rawScore >= 16) iq = 100 + (rawScore - 16) * 3.75;
+  else if (rawScore >= 12) iq = 85 + (rawScore - 12) * 3.75;
+  else if (rawScore >= 8) iq = 72 + (rawScore - 8) * 3.25;
+  else iq = 60 + rawScore * 1.5;
+  iq = Math.round(Math.max(60, Math.min(165, iq)));
 
-  const percentileRanks = [0,1,2,3,5,8,12,17,24,33,42,52,62,72,81,88,94,98,99,100];
-  const scoreBins = [0,2,4,6,8,9,10,11,12,13,14,15,16,17,18,19,20,22,25,30];
+  const percentileRanks = [0,1,2,5,9,16,25,37,50,63,75,84,91,96,98,99,100];
+  const scoreBins = [0,4,6,8,10,12,14,16,18,20,22,24,26,28,29,30,30];
   let percentile = 50;
   for (let i = 0; i < scoreBins.length; i++) {
     if (rawScore <= scoreBins[i]) { percentile = percentileRanks[i]; break; }
@@ -125,16 +210,7 @@ function calculateIQ() {
   const timeMinutes = Math.floor(timeSeconds / 60);
   const timeRemainder = timeSeconds % 60;
 
-  return {
-    rawScore,
-    total: questions.length,
-    iq,
-    percentile,
-    categories,
-    timeMinutes,
-    timeRemainder,
-    timeSeconds
-  };
+  return { rawScore, total: questions.length, iq, percentile, categories, timeMinutes, timeRemainder, timeSeconds };
 }
 
 function showResults() {
@@ -144,7 +220,7 @@ function showResults() {
   document.getElementById('iqScore').textContent = result.iq;
 
   const labels = ['Below Average', 'Average', 'Above Average', 'Gifted', 'Genius'];
-  const thresholds = [70, 90, 110, 150, 200];
+  const thresholds = [70, 90, 110, 130, 150];
   let label = labels[0];
   for (let i = thresholds.length - 1; i >= 0; i--) {
     if (result.iq >= thresholds[i]) { label = labels[i]; break; }
@@ -173,9 +249,19 @@ function showResults() {
   document.getElementById('timeTaken').textContent = `${result.timeMinutes}m ${result.timeRemainder}s`;
   document.getElementById('totalQuestionsResult').textContent = result.total;
 
+  const isPerfect = result.rawScore === result.total;
+  const advBtn = document.getElementById('advancedUnlockBtn');
+  if (isPerfect) {
+    advBtn.style.display = 'inline-flex';
+  } else {
+    advBtn.style.display = 'none';
+  }
+
   saveToHistory(result);
   renderHistory();
 }
+
+// ─── History ───
 
 function saveToHistory(result) {
   const history = JSON.parse(localStorage.getItem('iq_history') || '[]');
@@ -184,10 +270,8 @@ function saveToHistory(result) {
     iq: result.iq,
     rawScore: result.rawScore,
     total: result.total,
-    percentile: result.percentile,
-    timeMinutes: result.timeMinutes,
-    timeRemainder: result.timeRemainder,
-    categories: result.categories
+    percentile: result.percentile || 99,
+    categories: result.categories || {}
   });
   if (history.length > 20) history.length = 20;
   localStorage.setItem('iq_history', JSON.stringify(history));
@@ -222,7 +306,7 @@ function showHistoryDetail(idx) {
   const history = JSON.parse(localStorage.getItem('iq_history') || '[]');
   const h = history[idx];
   const d = new Date(h.date);
-  alert(`IQ: ${h.iq}\nScore: ${h.rawScore}/${h.total}\nPercentile: ${h.percentile}th\nDate: ${d.toLocaleDateString()}\nTime: ${h.timeMinutes}m ${h.timeRemainder}s`);
+  alert(`IQ: ${h.iq}\nScore: ${h.rawScore}/${h.total}\nPercentile: ${h.percentile}th\nDate: ${d.toLocaleDateString()}\nTime: ${h.timeMinutes || '?'}m ${h.timeRemainder || '?'}s`);
 }
 
 function clearHistory() {
