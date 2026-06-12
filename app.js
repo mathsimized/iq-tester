@@ -110,8 +110,8 @@ function calculateIQ() {
   });
 
   const rawScore = correct;
-  let iq = Math.round(0.3022 * rawScore * rawScore - 1.866 * rawScore + 60);
-  iq = Math.max(60, Math.min(300, iq));
+  let iq = Math.round(60 + Math.pow(rawScore / 30, 2) * 290);
+  iq = Math.max(60, Math.min(350, iq));
   iq = Math.round(Math.max(60, Math.min(160, iq)));
 
   const percentileRanks = [0,1,2,3,5,8,12,17,24,33,42,52,62,72,81,88,94,98,99,100];
@@ -144,7 +144,7 @@ function showResults() {
   document.getElementById('iqScore').textContent = result.iq;
 
   const labels = ['Below Average', 'Average', 'Above Average', 'Gifted', 'Genius'];
-  const thresholds = [70, 90, 110, 140, 180];
+  const thresholds = [70, 90, 110, 150, 200];
   let label = labels[0];
   for (let i = thresholds.length - 1; i >= 0; i--) {
     if (result.iq >= thresholds[i]) { label = labels[i]; break; }
