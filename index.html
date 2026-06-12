@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IQ Test — Measure Your Intelligence</title>
+  <meta name="description" content="Take a free IQ test with 30 questions covering pattern recognition, math logic, verbal reasoning, and spatial reasoning.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+
+    <!-- ─── Landing Screen ─── -->
+    <div id="landingScreen" class="screen active">
+      <div class="logo">🧠</div>
+      <h1>IQ Test</h1>
+      <p>30 questions covering pattern recognition, math logic, verbal reasoning, and spatial reasoning.</p>
+      <div class="features">
+        <span class="feature-tag">🧩 Patterns</span>
+        <span class="feature-tag">🔢 Math</span>
+        <span class="feature-tag">💬 Verbal</span>
+        <span class="feature-tag">📐 Spatial</span>
+      </div>
+      <button class="btn btn-primary" onclick="showScreen('instructionsScreen')" style="margin-top:8px;">Start Test</button>
+      <button class="btn btn-outline btn-sm" onclick="showScreen('historyScreen')" style="margin-top:8px;">View Past Results</button>
+    </div>
+
+    <!-- ─── Instructions Screen ─── -->
+    <div id="instructionsScreen" class="screen">
+      <div class="instructions-card">
+        <h2>Before You Begin</h2>
+        <ul>
+          <li>30 questions of increasing difficulty</li>
+          <li>No time limit — take as long as you need</li>
+          <li>You cannot skip questions (must select an answer to continue)</li>
+          <li>You can go back to review previous questions</li>
+          <li>Answer honestly for the most accurate result</li>
+        </ul>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:center;padding:8px 0;">
+        <button class="btn btn-outline" onclick="showScreen('landingScreen')">← Back</button>
+        <button class="btn btn-primary" onclick="initTest()">Begin Test →</button>
+      </div>
+    </div>
+
+    <!-- ─── Test Screen ─── -->
+    <div id="testScreen" class="screen">
+      <div class="test-header">
+        <span class="badge" id="qBadge">Pattern</span>
+        <div class="progress-container">
+          <div class="progress-bar">
+            <div class="progress-fill" id="progressBar"></div>
+          </div>
+          <div class="progress-text" id="progressText">Question 1 of 30</div>
+        </div>
+      </div>
+      <div class="question-card">
+        <div class="q-number" id="qNumber">Question 1</div>
+        <div class="q-text" id="qText"></div>
+        <div class="options-grid" id="optionsContainer"></div>
+      </div>
+      <div class="nav-buttons">
+        <button class="btn btn-outline btn-sm" id="prevBtn" onclick="prevQuestion()" style="display:none;">← Previous</button>
+        <span style="flex:1;"></span>
+        <button class="btn btn-primary btn-sm" id="nextBtn" onclick="nextQuestion()" disabled>Next →</button>
+      </div>
+    </div>
+
+    <!-- ─── Result Screen ─── -->
+    <div id="resultScreen" class="screen">
+      <div class="results-header">
+        <h2 style="color:var(--muted2);font-size:0.9rem;text-transform:uppercase;letter-spacing:2px;">Your IQ Score</h2>
+        <div class="iq-circle">
+          <span class="iq-number" id="iqScore">—</span>
+          <span class="iq-label" id="iqLabel">—</span>
+        </div>
+      </div>
+      <div class="stats-row">
+        <div class="stat-item">
+          <div class="stat-value" id="percentile">—</div>
+          <div class="stat-label">Percentile</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="rawScore">—</div>
+          <div class="stat-label">Correct</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="timeTaken">—</div>
+          <div class="stat-label">Time</div>
+        </div>
+      </div>
+      <div class="category-breakdown">
+        <h3>Breakdown by Category</h3>
+        <div id="categoryBreakdown"></div>
+      </div>
+      <div class="result-footer">
+        <button class="btn btn-primary btn-sm" onclick="showScreen('landingScreen')">Take Again</button>
+        <button class="btn btn-outline btn-sm" onclick="showScreen('historyScreen')">View History</button>
+      </div>
+    </div>
+
+    <!-- ─── History Screen ─── -->
+    <div id="historyScreen" class="screen">
+      <div class="history-section">
+        <div class="history-header">
+          <h3>📊 Past Results</h3>
+          <button class="btn btn-outline btn-sm" onclick="clearHistory()" style="color:var(--danger);border-color:var(--danger);">Clear</button>
+        </div>
+        <div id="historyList">
+          <p style="color:var(--muted);text-align:center;padding:24px;">No past results yet.</p>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:center;padding:8px 0;">
+        <button class="btn btn-outline" onclick="showScreen('landingScreen')">← Back</button>
+        <button class="btn btn-primary" onclick="initTest()">Take Test</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="questions.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
