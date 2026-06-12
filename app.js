@@ -245,13 +245,8 @@ function showResults() {
   document.getElementById('timeTaken').textContent = `${result.timeMinutes}m ${result.timeRemainder}s`;
   document.getElementById('totalQuestionsResult').textContent = result.total;
 
-  const isPerfect = result.rawScore === result.total;
   const advBtn = document.getElementById('advancedUnlockBtn');
-  if (isPerfect) {
-    advBtn.style.display = 'inline-flex';
-  } else {
-    advBtn.style.display = 'none';
-  }
+  advBtn.style.display = 'inline-flex';
 
   saveToHistory(result);
   renderHistory();
@@ -297,13 +292,8 @@ function showAdvancedResults() {
   document.getElementById('advRawScore').textContent = `${result.rawScore} / ${result.total}`;
   document.getElementById('advTimeTaken').textContent = `${result.timeMinutes}m ${result.timeRemainder}s`;
 
-  const isPerfect = result.rawScore === result.total;
   const nBtn = document.getElementById('nightmareUnlockBtn');
-  if (isPerfect) {
-    nBtn.style.display = 'inline-flex';
-  } else {
-    nBtn.style.display = 'none';
-  }
+  nBtn.style.display = 'inline-flex';
 
   saveToHistory({ ...result, percentile: 99, categories: {} });
 }
