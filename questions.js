@@ -117,11 +117,11 @@ const questions = [
 
   // ─── Verbal Reasoning (17-23) ───
   {
-    id: 17, type: 'verbal', difficulty: 2,
-    question: 'Finger is to hand as toe is to:',
-    options: ['Foot', 'Leg', 'Shoe', 'Ankle'],
-    answer: 0,
-    explanation: 'Fingers are part of a hand. Toes are part of a foot.'
+    id: 17, type: 'verbal', difficulty: 6,
+    question: 'A plane crashes exactly on the border of the US and Canada. The pilot and all 150 passengers survive. Where should the survivors be buried?',
+    options: ['In the US', 'In Canada', 'At the nearest hospital', 'Survivors are not buried'],
+    answer: 3,
+    explanation: 'You do not bury survivors — they are alive! This is a classic trick question. Most people get caught up in the border dispute and miss the word "survivors."'
   },
   {
     id: 18, type: 'verbal', difficulty: 4,
@@ -189,11 +189,11 @@ const questions = [
     explanation: 'Count squares of each size: 8² (1×1) + 7² (2×2) + ... + 1² (8×8) = 64+49+36+25+16+9+4+1 = 204.'
   },
   {
-    id: 27, type: 'spatial', difficulty: 3,
-    question: 'If today is Monday, what day of the week is it 100 days from now?',
-    options: ['Monday', 'Tuesday', 'Wednesday', 'Thursday'],
-    answer: 2,
-    explanation: '100 mod 7 = 2. Monday + 2 = Wednesday.'
+    id: 27, type: 'pattern', difficulty: 6,
+    question: 'What is the next number?<br><span style="font-size:1.2rem">3, 3, 5, 4, 4, 3, 5, 5, 4, ?</span>',
+    options: ['3', '4', '5', '6'],
+    answer: 0,
+    explanation: 'These are the number of letters in the English words for numbers: one(3), two(3), three(5), four(4), five(4), six(3), seven(5), eight(5), nine(4), ten(3). The 10th term corresponds to "ten" which has 3 letters.'
   },
   {
     id: 28, type: 'spatial', difficulty: 4,

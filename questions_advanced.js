@@ -14,11 +14,11 @@ const advancedQuestions = [
     explanation: 'In alphabetical order: eight, five, four, nine, one, seven, six, three, two. Next is 3 (three).'
   },
   {
-    id: 103, type: 'math', difficulty: 5,
-    question: 'What is the sum of all integers from 1 to 100?',
-    options: ['4950', '5000', '5050', '10100'],
-    answer: 2,
-    explanation: 'Pair 1+100 = 101, 2+99 = 101... 50 pairs × 101 = 5050. (Gauss method.)'
+    id: 103, type: 'math', difficulty: 7,
+    question: 'What number comes next in this infinite cycle?<br><span style="font-size:1.2rem">4, 16, 37, 58, 89, 145, 42, 20, ?</span>',
+    options: ['1', '4', '10', '16'],
+    answer: 1,
+    explanation: 'Each term is the sum of squares of digits of the previous: 4→4²=16, 16→1²+6²=37, ... 20→2²+0²=4, so it cycles back to 4. This is the unhappy/sad number cycle in number theory.'
   },
   {
     id: 104, type: 'math', difficulty: 6,
@@ -89,11 +89,11 @@ const advancedQuestions = [
     explanation: '1×1: 64, 2×2: 49, 3×3: 36, 4×4: 25, 5×5: 16, 6×6: 9, 7×7: 4, 8×8: 1. Total = 64+49+36+25+16+9+4+1 = 204.'
   },
   {
-    id: 113, type: 'math', difficulty: 5,
-    question: '5 cats catch 5 mice in 5 minutes. How many cats catch 100 mice in 100 minutes?',
-    options: ['5', '20', '100', '500'],
-    answer: 0,
-    explanation: '1 cat catches 1 mouse in 5 minutes. In 100 minutes, 1 cat catches 20 mice. To catch 100 mice in 100 minutes: 100/20 = 5 cats.'
+    id: 113, type: 'math', difficulty: 7,
+    question: 'How many trailing zeros does 100! (100 factorial) have?',
+    options: ['12', '20', '24', '49'],
+    answer: 2,
+    explanation: 'Trailing zeros come from factors of 10 = 2×5. There are always more 2s than 5s, so count factors of 5: ⌊100/5⌋ + ⌊100/25⌋ + ⌊100/125⌋ = 20 + 4 + 0 = 24. The trap is forgetting multiples of 25 contribute an extra 5.'
   },
   {
     id: 114, type: 'pattern', difficulty: 6,

@@ -4,12 +4,12 @@ const state = {
   startTime: null,
   endTime: null,
   finished: false,
-  advancedMode: false,
-  advancedAnswers: []
+  nightmareMode: false,
+  nightmareAnswers: []
 };
 
 let shuffledOrder = [];
-let advShuffledOrder = [];
+let nightmareShuffledOrder = [];
 
 function getScreen(id) {
   return document.getElementById(id);
@@ -39,23 +39,23 @@ function initTest() {
   state.startTime = Date.now();
   state.endTime = null;
   state.finished = false;
-  state.advancedMode = false;
+  state.nightmareMode = false;
   showScreen('testScreen');
   renderQuestion();
 }
 
 function renderQuestion() {
-  const isAdvanced = state.advancedMode;
+  const isAdvanced = state.nightmareMode;
   const qList = isAdvanced ? advancedQuestions : questions;
-  const order = isAdvanced ? advShuffledOrder : shuffledOrder;
-  const ansList = isAdvanced ? state.advancedAnswers : state.answers;
+  const order = isAdvanced ? nightmareShuffledOrder : shuffledOrder;
+  const ansList = isAdvanced ? state.nightmareAnswers : state.answers;
   const total = qList.length;
   const idx = order[state.current];
   const q = qList[idx];
 
   document.getElementById('progressBar').style.width = (state.current / total * 100) + '%';
   document.getElementById('progressText').textContent = `Question ${state.current + 1} of ${total}`;
-  if (isAdvanced) document.getElementById('progressText').textContent += ' [ADVANCED]';
+  if (isAdvanced) document.getElementById('progressText').textContent += ' [NIGHTMARE]';
 
   document.getElementById('qBadge').textContent = typeLabels[q.type] || q.type;
   document.getElementById('qNumber').textContent = `Question ${state.current + 1}`;
@@ -80,7 +80,7 @@ function renderQuestion() {
 }
 
 function selectOption(idx) {
-  const ansList = state.advancedMode ? state.advancedAnswers : state.answers;
+  const ansList = state.nightmareMode ? state.nightmareAnswers : state.answers;
   ansList[state.current] = idx;
   document.querySelectorAll('.option-btn').forEach((btn, i) => {
     btn.classList.toggle('selected', i === idx);
@@ -89,11 +89,11 @@ function selectOption(idx) {
 }
 
 function nextQuestion() {
-  const ansList = state.advancedMode ? state.advancedAnswers : state.answers;
+  const ansList = state.nightmareMode ? state.nightmareAnswers : state.answers;
   if (ansList[state.current] === null) return;
-  const total = state.advancedMode ? advancedQuestions.length : questions.length;
+  const total = state.nightmareMode ? advancedQuestions.length : questions.length;
   if (state.current === total - 1) {
-    if (state.advancedMode) finishAdvancedTest();
+    if (state.nightmareMode) finishNightmareTest();
     else finishTest();
     return;
   }
@@ -113,28 +113,28 @@ function finishTest() {
   showResults();
 }
 
-// ─── Advanced Test ───
+// ─── Nightmare Mode ───
 
-function initAdvancedTest() {
-  advShuffledOrder = shuffleArray([...Array(advancedQuestions.length).keys()]);
+function initNightmareTest() {
+  nightmareShuffledOrder = shuffleArray([...Array(advancedQuestions.length).keys()]);
   state.current = 0;
-  state.advancedAnswers = new Array(advancedQuestions.length).fill(null);
+  state.nightmareAnswers = new Array(advancedQuestions.length).fill(null);
   state.startTime = Date.now();
   state.endTime = null;
-  state.advancedMode = true;
+  state.nightmareMode = true;
   showScreen('testScreen');
   renderQuestion();
 }
 
-function finishAdvancedTest() {
+function finishNightmareTest() {
   state.endTime = Date.now();
-  showAdvancedResults();
+  showNightmareResults();
 }
 
-function calculateAdvancedIQ() {
+function calculateNightmareIQ() {
   let correct = 0;
-  advShuffledOrder.forEach((qIdx, i) => {
-    if (state.advancedAnswers[i] === advancedQuestions[qIdx].answer) correct++;
+  nightmareShuffledOrder.forEach((qIdx, i) => {
+    if (state.nightmareAnswers[i] === advancedQuestions[qIdx].answer) correct++;
   });
 
   const rawScore = correct;
@@ -155,20 +155,20 @@ function calculateAdvancedIQ() {
   return { rawScore, total, iq, timeMinutes, timeRemainder, timeSeconds };
 }
 
-function showAdvancedResults() {
-  const result = calculateAdvancedIQ();
-  showScreen('advResultScreen');
+function showNightmareResults() {
+  const result = calculateNightmareIQ();
+  showScreen('nightmareResultScreen');
 
-  document.getElementById('advIqScore').textContent = result.iq;
+  document.getElementById('nightmareIqScore').textContent = result.iq;
   const labels = ['Elite', 'Genius', 'Transcendent'];
   const thresholds = [180, 220, 260];
   let label = labels[0];
   for (let i = thresholds.length - 1; i >= 0; i--) {
     if (result.iq >= thresholds[i]) { label = labels[i]; break; }
   }
-  document.getElementById('advIqLabel').textContent = label;
-  document.getElementById('advRawScore').textContent = `${result.rawScore} / ${result.total}`;
-  document.getElementById('advTimeTaken').textContent = `${result.timeMinutes}m ${result.timeRemainder}s`;
+  document.getElementById('nightmareIqLabel').textContent = label;
+  document.getElementById('nightmareRawScore').textContent = `${result.rawScore} / ${result.total}`;
+  document.getElementById('nightmareTimeTaken').textContent = `${result.timeMinutes}m ${result.timeRemainder}s`;
 
   saveToHistory({ ...result, percentile: 99, categories: {} });
 }
@@ -190,14 +190,13 @@ function calculateIQ() {
 
   const rawScore = correct;
   let iq;
-  if (rawScore >= 28) iq = 150 + (rawScore - 28) * 7.5;
-  else if (rawScore >= 24) iq = 130 + (rawScore - 24) * 5;
-  else if (rawScore >= 20) iq = 115 + (rawScore - 20) * 3.75;
-  else if (rawScore >= 16) iq = 100 + (rawScore - 16) * 3.75;
-  else if (rawScore >= 12) iq = 85 + (rawScore - 12) * 3.75;
-  else if (rawScore >= 8) iq = 72 + (rawScore - 8) * 3.25;
-  else iq = 60 + rawScore * 1.5;
-  iq = Math.round(Math.max(60, Math.min(165, iq)));
+  if (rawScore >= 27) iq = 200 + (rawScore - 27) * 50 / 3;
+  else if (rawScore >= 24) iq = 165 + (rawScore - 24) * 35 / 3;
+  else if (rawScore >= 20) iq = 130 + (rawScore - 20) * 35 / 4;
+  else if (rawScore >= 16) iq = 100 + (rawScore - 16) * 30 / 4;
+  else if (rawScore >= 12) iq = 80 + (rawScore - 12) * 5;
+  else iq = 60 + rawScore * 20 / 12;
+  iq = Math.round(Math.max(60, Math.min(250, iq)));
 
   const percentileRanks = [0,1,2,5,9,16,25,37,50,63,75,84,91,96,98,99,100];
   const scoreBins = [0,4,6,8,10,12,14,16,18,20,22,24,26,28,29,30,30];
@@ -250,7 +249,7 @@ function showResults() {
   document.getElementById('totalQuestionsResult').textContent = result.total;
 
   const isPerfect = result.rawScore === result.total;
-  const advBtn = document.getElementById('advancedUnlockBtn');
+  const advBtn = document.getElementById('nightmareUnlockBtn');
   if (isPerfect) {
     advBtn.style.display = 'inline-flex';
   } else {
