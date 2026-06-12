@@ -88,6 +88,58 @@ body {
   color: var(--muted);
 }
 
+/* ─── Tier Info ─── */
+.tier-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 8px 0 20px;
+  width: 100%;
+  max-width: 480px;
+}
+
+.tier-card {
+  flex: 1;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 8px;
+  text-align: center;
+  transition: all 0.2s;
+}
+
+.tier-card.locked {
+  opacity: 0.5;
+}
+
+.tier-icon {
+  font-size: 1.4rem;
+  margin-bottom: 2px;
+}
+
+.tier-name {
+  font-size: 0.78rem;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.tier-detail {
+  font-size: 0.65rem;
+  color: var(--muted2);
+}
+
+.tier-unlock {
+  font-size: 0.6rem;
+  color: var(--muted);
+  margin-top: 3px;
+}
+
+.tier-arrow {
+  color: var(--muted2);
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
 /* ─── Buttons ─── */
 .btn {
   display: inline-flex;
@@ -425,4 +477,8 @@ body {
   .option-btn { padding: 12px 14px; font-size: 0.9rem; }
   .stats-row { gap: 12px; }
   .stat-item { min-width: 80px; padding: 10px 14px; }
+  .tier-info { gap: 4px; }
+  .tier-card { padding: 8px 4px; }
+  .tier-detail { font-size: 0.6rem; }
+  .tier-arrow { font-size: 0.85rem; }
 }
