@@ -32,7 +32,6 @@ function initTest() {
   state.startTime = Date.now();
   state.endTime = null;
   state.finished = false;
-  getScreen('testScreen').querySelector('.question-grid').scrollTop = 0;
   showScreen('testScreen');
   renderQuestion();
 }
