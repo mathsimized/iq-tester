@@ -110,14 +110,22 @@ function calculateIQ() {
   });
 
   const rawScore = correct;
-  const mean = 18;
-  const sd = 5;
-  let z = (rawScore - mean) / sd;
-  let iq = Math.round(100 + z * 15);
-  iq = Math.max(60, Math.min(160, iq));
+  let iq;
+  if (rawScore >= 29) iq = 142 + (rawScore - 29) * 8;
+  else if (rawScore >= 27) iq = 133 + (rawScore - 27) * 4.5;
+  else if (rawScore >= 25) iq = 125 + (rawScore - 25) * 4;
+  else if (rawScore >= 23) iq = 118 + (rawScore - 23) * 3.5;
+  else if (rawScore >= 21) iq = 112 + (rawScore - 21) * 3;
+  else if (rawScore >= 19) iq = 106 + (rawScore - 19) * 3;
+  else if (rawScore >= 17) iq = 100 + (rawScore - 17) * 3;
+  else if (rawScore >= 15) iq = 97 + (rawScore - 15) * 1.5;
+  else if (rawScore >= 12) iq = 90 + (rawScore - 12) * 2.33;
+  else if (rawScore >= 10) iq = 84 + (rawScore - 10) * 3;
+  else iq = 60 + rawScore * 2.4;
+  iq = Math.round(Math.max(60, Math.min(160, iq)));
 
   const percentileRanks = [0,1,2,5,9,16,25,37,50,63,75,84,91,96,98,99,100];
-  const scoreBins = [0,4,6,8,10,12,14,16,18,20,22,24,26,28,29,30,30];
+  const scoreBins = [0,3,5,7,9,11,13,15,17,19,21,23,25,27,28,29,30];
   let percentile = 50;
   for (let i = 0; i < scoreBins.length; i++) {
     if (rawScore <= scoreBins[i]) { percentile = percentileRanks[i]; break; }
